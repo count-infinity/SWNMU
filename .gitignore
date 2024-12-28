@@ -54,3 +54,5 @@ nosetests.xml
 
 # VSCode config
 .vscode
+
+swnmu_backup.sql

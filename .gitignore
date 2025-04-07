@@ -56,3 +56,4 @@ nosetests.xml
 .vscode
 
 swnmu_backup.sql
+*.bak

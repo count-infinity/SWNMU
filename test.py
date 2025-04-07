@@ -2,11 +2,12 @@ import re
 
 LINKS_SUB = re.compile(r"\|lc(.*?)(?:\|lh(.*))?\|lt(.*?)\|le", re.DOTALL)
 
-#text='|lc a|b|c |lh e|f|g |ltblah|le'
-text='|lc say hi|ltblah|le'
+# text='|lc a|b|c |lh e|f|g |ltblah|le'
+text = "|lc say hi|ltblah|le"
+
 
 def parse_send(matches):
-    
+
     commands = matches.group(1)
     hints = matches.group(2)
     text = matches.group(3)
@@ -16,15 +17,16 @@ def parse_send(matches):
     print(f"text {text}")
 
     # Must be an mxp MENU
-    if '|' in commands:
-        hintstr=None
+    if "|" in commands:
+        hintstr = None
         if hints:
-            hintstr=f'hints="{hints.strip()}"'
+            hintstr = f'hints="{hints.strip()}"'
 
-        return f'<SEND "{commands.strip()}" {hintstr}>{text}</SEND>'    
+        return f'<SEND "{commands.strip()}" {hintstr}>{text}</SEND>'
     return f'<SEND HREF="{commands}">{text}</SEND>'
 
-text = re.sub(LINKS_SUB,parse_send,text)
+
+text = re.sub(LINKS_SUB, parse_send, text)
 print(text)
 # if match:
 #     print(f"Group 1 (commands): {match.group(1)}")

@@ -34,10 +34,10 @@ from evennia.settings_default import *
 # This is the name of your game. Make it catchy!
 SERVERNAME = "SWNMU"
 
-AUTH_PASSWORD_VALIDATORS=[]
-MULTISESSION_MODE=2
-MAX_NR_SIMULTANEOUS_PUPPETS=5
-MAX_NR_CHARACTERS=10
+AUTH_PASSWORD_VALIDATORS = []
+MULTISESSION_MODE = 2
+MAX_NR_SIMULTANEOUS_PUPPETS = 5
+MAX_NR_CHARACTERS = 10
 AUTO_PUPPET_ON_LOGIN = False
 AUTO_CREATE_CHARACTER_WITH_ACCOUNT = False
 FUNCPARSER_PARSE_OUTGOING_MESSAGES_ENABLED = False
@@ -47,9 +47,9 @@ FUNCPARSER_PARSE_OUTGOING_MESSAGES_ENABLED = False
 # Godot websocket server
 #########################################
 
-#PORTAL_SERVICES_PLUGIN_MODULES.append('evennia.contrib.base_systems.godotwebsocket.webclient')
-#GODOT_CLIENT_WEBSOCKET_PORT = 4008
-#GODOT_CLIENT_WEBSOCKET_CLIENT_INTERFACE = "0.0.0.0"
+# PORTAL_SERVICES_PLUGIN_MODULES.append('evennia.contrib.base_systems.godotwebsocket.webclient')
+# GODOT_CLIENT_WEBSOCKET_PORT = 4008
+# GODOT_CLIENT_WEBSOCKET_CLIENT_INTERFACE = "0.0.0.0"
 
 ######################################################################
 # Settings given in secret_settings.py override those in this file.

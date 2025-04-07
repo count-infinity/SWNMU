@@ -215,8 +215,3 @@ class Object(ObjectParent, DefaultObject):
     """
 
     pass
-
-
-        
-        
-           

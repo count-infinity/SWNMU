@@ -33,7 +33,9 @@ class Command(BaseCommand):
     #
     pass
 
+
 import debugpy
+
 
 class CmdDebug(Command):
     key = "debug"
@@ -44,7 +46,7 @@ class CmdDebug(Command):
     def func(self):
         caller = self.caller
         print("Waiting for debugger attach")
-        debugpy.listen(('localhost', 5678))
+        debugpy.listen(("localhost", 5678))
         debugpy.wait_for_client()
         caller.msg("Debugger attached")
         print("Debugger attached")
@@ -58,18 +60,20 @@ class CmdBlah(Command):
 
     def func(self):
         self.helper1()
-        
-    
+
     def helper1(self):
-        x=[]
+        x = []
         self.helper2()
+
     def helper2(self):
         self.helper3()
+
     def helper3(self):
         raise Exception("Testing py error traceback")
-    
+
 
 import sys
+
 
 def trace_calls(frame, event, arg):
     if event == "call":
@@ -80,6 +84,7 @@ def trace_calls(frame, event, arg):
 
         print(f"Called {function_name} in {filename}:{lineno}")
     return trace_calls
+
 
 class TracedCmdLook(CmdLook):
     def func(self):
@@ -92,9 +97,10 @@ class TracedCmdLook(CmdLook):
             sys.settrace(None)  # Stop tracing after execution
             print("===== Trace Ended =====")
 
+
 class CmdMXP(Command):
-    key="mxptest"
+    key = "mxptest"
+
     def func(self):
-        self.caller.msg('|lcsay my test |lt|rMytest|n|le')
-        self.caller.msg('|lc say what\;say tree|lh |rhi|n;|bidk|n\;last |lt|bblah|n|le')
-        
+        self.caller.msg("|lcsay my test |lt|rMytest|n|le")
+        self.caller.msg("|lc say what\;say tree|lh |rhi|n;|bidk|n\;last |lt|bblah|n|le")

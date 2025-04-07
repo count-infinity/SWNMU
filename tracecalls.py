@@ -1,5 +1,6 @@
 import sys
 
+
 def trace_calls(frame, event, arg):
     """
     Trace function calls and print their details.
@@ -13,11 +14,13 @@ def trace_calls(frame, event, arg):
         print(f"Called {function_name} in {filename}:{lineno}")
     return trace_calls  # Keep tracing subsequent calls
 
+
 def start_tracing():
     """
     Start tracing all function calls.
     """
     sys.settrace(trace_calls)
+
 
 def stop_tracing():
     """

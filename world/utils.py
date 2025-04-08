@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 import re
 import random
 
@@ -27,3 +27,15 @@ def roll_dice(dice_string: str) -> DiceResult:
     total = sum(rolls) + modifier
 
     return DiceResult(rolls=rolls, modifier=modifier, total=total)
+
+
+BASE_STATS=["STRENGTH","DEXTERITY","CONSTITUTION","INTELLIGENCE","WISDOM","CHARISMA"]
+
+def pick_stats() -> Dict[str, DiceResult]:
+    result: Dict[str, DiceResult]={}
+    for stat in BASE_STATS:
+        result[stat]=roll_dice("3d6")
+
+    return result
+
+

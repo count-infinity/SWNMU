@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from .utils import roll_dice, pick_stats
+from .utils import roll_dice, pick_stats, render_stats
 
 
 class TestRollDice(unittest.TestCase):
@@ -38,4 +38,8 @@ class TestPickStatus(unittest.TestCase):
         self.assertEqual(result["INTELLIGENCE"].total,12)
         self.assertEqual(result["WISDOM"].total,15)
         self.assertEqual(result["CHARISMA"].total,18)
+
+class TestRenderStats(unittest.TestCase):
+    def testRenderStats(self):
+        result=render_stats(pick_stats())
 

@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import List, Dict
 import re
 import random
-
+from evennia.utils import evtable
+from .tables import lookup, attribute_modifier_tbl
 
 @dataclass
 class DiceResult:
@@ -39,3 +40,15 @@ def pick_stats() -> Dict[str, DiceResult]:
     return result
 
 
+def render_stats(stats):
+
+    statTbl=[]
+    for stat in BASE_STATS:
+        statTbl.append([stat,stats[stat].total,lookup(stats[stat].total,attribute_modifier_tbl)])
+
+
+    table = evtable.EvTable("Stat", "Value","Mod",border="cells")
+    for row in statTbl:
+        table.add_row(*[str(item) for item in row])
+    
+    print(table)

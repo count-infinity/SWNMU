@@ -51,4 +51,4 @@ def render_stats(stats):
     for row in statTbl:
         table.add_row(*[str(item) for item in row])
     
-    print(table)
+    return table

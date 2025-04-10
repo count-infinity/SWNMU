@@ -16,6 +16,7 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 from evennia import default_cmds
 from commands.command import *
+from world.chargen import SWNCmdCharCreate
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -31,8 +32,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         """
         Populates the cmdset
         """
-        super().at_cmdset_creation()
-        self.add(CmdDebug)
+        super().at_cmdset_creation()        
         self.add(CmdBlah)
         self.add(CmdMXP)
         #
@@ -58,6 +58,8 @@ class AccountCmdSet(default_cmds.AccountCmdSet):
         #
         # any commands you add below will overload the default ones.
         #
+        self.add(CmdDebug)
+        self.add(SWNCmdCharCreate)
 
 
 class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
@@ -72,7 +74,7 @@ class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):
         """
         Populates the cmdset
         """
-        super().at_cmdset_creation()
+        super().at_cmdset_creation()        
         #
         # any commands you add below will overload the default ones.
         #

@@ -7,7 +7,6 @@ Commands describe the input the account can do to the game.
 
 from evennia.commands.command import Command as BaseCommand
 from evennia.commands.default.general import CmdLook
-from commands import Extension
 
 # from evennia import default_cmds
 

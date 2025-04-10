@@ -1,6 +1,7 @@
 from commands.command import Command
 from evennia.utils import evmenu
 from world.utils import pick_stats, render_stats
+from world import tables
 
 class TemporaryCharacterSheet:
     pass
@@ -36,12 +37,13 @@ class SWNCmdCharCreate(Command):
 
 def create_char_menu(caller, args):
      print(f"Args: {args}")
-     evmenu.EvMenu(caller, {"start": node_chargen_start, "end": node_end})
+     evmenu.EvMenu(caller, {"start": node_chargen_start, "end": node_end, "background": node_background})
 
 
 def node_chargen_start(caller, raw_text, **kwargs):
-    stats = pick_stats()
-    tbl=render_stats(stats)
+    if not (hasattr(caller.ndb._evmenu, 'stats') and caller.ndb._evmenu.stats is not None) or raw_text=="r":
+        caller.ndb._evmenu.stats = pick_stats()
+    tbl=render_stats(caller.ndb._evmenu.stats)
     text=f"""
 {tbl}
     """
@@ -52,10 +54,31 @@ def node_chargen_start(caller, raw_text, **kwargs):
         {"key": ("[R]eroll", "reroll", "r"),
          "desc": "Roll again",
          "goto": "start"},
+         {"key": ("[N]ext", "next", "n"),
+         "desc": "Background",
+         "goto": "background"},
          {"key": "_default",
          "goto": "start"}
     )
     return text, options
+
+def node_background(caller, raw_input, **kwargs):
+    text="""
+    Choose a background    
+    """
+
+    options=[{ "desc": f"{background.name} - {background.description}"} for background in tables.background]
+    options.append(
+        {"key": ("[B]ack", "back", "b"),
+         "desc": "Back to stats.",
+         "goto": "start"}
+    )
+    options.append({"key": ("[A]bort", "abort", "a"),
+         "desc": "Answer neither, and abort.",
+         "goto": "end"})
+   
+    
+    return text, options  # empty options ends the menu
 
 def node_end(caller, raw_input, **kwargs):
     text="Thanks for your answer. Goodbye!"

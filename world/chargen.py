@@ -3,6 +3,7 @@ from evennia.utils import evmenu
 from world.utils import pick_stats, render_stats
 from world import tables
 
+
 class TemporaryCharacterSheet:
     pass
 
@@ -37,13 +38,19 @@ class SWNCmdCharCreate(Command):
 
 def create_char_menu(caller, args):
      print(f"Args: {args}")
-     evmenu.EvMenu(caller, {"start": node_chargen_start, "end": node_end, "background": node_background})
+     evmenu.EvMenu(caller, {"start": node_chargen_start, "end": node_end
+                            , "background": node_background,
+                            "background_select":node_background_select})
 
 
 def node_chargen_start(caller, raw_text, **kwargs):
-    if not (hasattr(caller.ndb._evmenu, 'stats') and caller.ndb._evmenu.stats is not None) or raw_text=="r":
-        caller.ndb._evmenu.stats = pick_stats()
-    tbl=render_stats(caller.ndb._evmenu.stats)
+    if not (hasattr(caller.ndb._evmenu, 'sheet') and caller.ndb._evmenu.sheet is not None):
+        caller.ndb._evmenu.sheet = TemporaryCharacterSheet()
+        caller.ndb._evmenu.sheet.stats=pick_stats()
+
+    if raw_text == "r":
+        caller.ndb._evmenu.sheet.stats=pick_stats()
+    tbl=render_stats(caller.ndb._evmenu.sheet.stats)
     text=f"""
 {tbl}
     """
@@ -67,7 +74,7 @@ def node_background(caller, raw_input, **kwargs):
     Choose a background    
     """
 
-    options=[{ "desc": f"{background.name} - {background.description}"} for background in tables.background]
+    options=[{ "desc": f"{background.name} - {background.description}", "goto": ("background_select",{ "selected_background": background})} for background in tables.background]
     options.append(
         {"key": ("[B]ack", "back", "b"),
          "desc": "Back to stats.",
@@ -79,6 +86,16 @@ def node_background(caller, raw_input, **kwargs):
    
     
     return text, options  # empty options ends the menu
+
+def node_background_select(caller,raw_input,**kwargs):
+    picked_bg=kwargs["selected_background"]
+    txt=f"{picked_bg}"
+    options=[{"key": ("[B]ack", "back", "b"),
+         "desc": "Back to backgrounds.",
+         "goto": "background"}]
+    
+    return txt,options
+
 
 def node_end(caller, raw_input, **kwargs):
     text="Thanks for your answer. Goodbye!"

@@ -24,8 +24,8 @@ class SWNCmdCharCreate(Command):
     help_category = "General"
 
     def func(self):
-        create_char_menu(self.caller,self.args)
-    
+        create_char_menu(self.caller, self.args)
+
 
 # class SWNChargenCmdSet(CmdSet):
 #     key = "Contrib Chargen CmdSet"
@@ -37,67 +37,86 @@ class SWNCmdCharCreate(Command):
 
 
 def create_char_menu(caller, args):
-     print(f"Args: {args}")
-     evmenu.EvMenu(caller, {"start": node_chargen_start, "end": node_end
-                            , "background": node_background,
-                            "background_select":node_background_select})
+    print(f"Args: {args}")
+    evmenu.EvMenu(
+        caller,
+        {
+            "start": node_chargen_start,
+            "end": node_end,
+            "background": node_background,
+            "background_select": node_background_select,
+        },
+    )
+
+
+def abortOpt():
+    return {
+        "key": ("[A]bort", "abort", "a"),
+        "desc": "Answer neither, and abort.",
+        "goto": "end",
+    }
+
+
+def nextOpt(desc, goto, **kwargs):
+    return {
+        "key": ("[N]ext", "next", "n"),
+        "desc": desc,
+        "goto": (goto, kwargs),
+    }
+
+
+def backOpt(desc, goto, **kwargs):
+
+    return {"key": ("[B]ack", "back", "b"), "desc": desc, "goto": (goto, kwargs)}
 
 
 def node_chargen_start(caller, raw_text, **kwargs):
-    if not (hasattr(caller.ndb._evmenu, 'sheet') and caller.ndb._evmenu.sheet is not None):
+    if not (
+        hasattr(caller.ndb._evmenu, "sheet") and caller.ndb._evmenu.sheet is not None
+    ):
         caller.ndb._evmenu.sheet = TemporaryCharacterSheet()
-        caller.ndb._evmenu.sheet.stats=pick_stats()
+        caller.ndb._evmenu.sheet.stats = pick_stats()
 
     if raw_text == "r":
-        caller.ndb._evmenu.sheet.stats=pick_stats()
-    tbl=render_stats(caller.ndb._evmenu.sheet.stats)
-    text=f"""
+        caller.ndb._evmenu.sheet.stats = pick_stats()
+    tbl = render_stats(caller.ndb._evmenu.sheet.stats)
+    text = f"""
 {tbl}
     """
-    options = (
-        {"key": ("[A]bort", "abort", "a"),
-         "desc": "Answer neither, and abort.",
-         "goto": "end"},
-        {"key": ("[R]eroll", "reroll", "r"),
-         "desc": "Roll again",
-         "goto": "start"},
-         {"key": ("[N]ext", "next", "n"),
-         "desc": "Background",
-         "goto": "background"},
-         {"key": "_default",
-         "goto": "start"}
-    )
+    options = [
+        {"key": ("[R]eroll", "reroll", "r"), "desc": "Roll again", "goto": "start"},
+        nextOpt("Background", "background", test=1),
+        abortOpt(),
+        {"key": "_default", "goto": "start"},
+    ]
     return text, options
 
+
 def node_background(caller, raw_input, **kwargs):
-    text="""
+    text = """
     Choose a background    
     """
 
-    options=[{ "desc": f"{background.name} - {background.description}", "goto": ("background_select",{ "selected_background": background})} for background in tables.background]
-    options.append(
-        {"key": ("[B]ack", "back", "b"),
-         "desc": "Back to stats.",
-         "goto": "start"}
-    )
-    options.append({"key": ("[A]bort", "abort", "a"),
-         "desc": "Answer neither, and abort.",
-         "goto": "end"})
-   
-    
+    options = [
+        {
+            "desc": f"{background.name} - {background.description}",
+            "goto": ("background_select", {"selected_background": background}),
+        }
+        for background in tables.background
+    ]
+    options.extend([backOpt("Back to stats.", "start"), abortOpt()])
+
     return text, options  # empty options ends the menu
 
-def node_background_select(caller,raw_input,**kwargs):
-    picked_bg=kwargs["selected_background"]
-    txt=f"{picked_bg}"
-    options=[{"key": ("[B]ack", "back", "b"),
-         "desc": "Back to backgrounds.",
-         "goto": "background"}]
-    
-    return txt,options
+
+def node_background_select(caller, raw_input, **kwargs):
+    picked_bg = kwargs["selected_background"]
+    txt = f"{picked_bg}"
+    options = [backOpt("Back to backgrounds.", "background")]
+
+    return txt, options
 
 
 def node_end(caller, raw_input, **kwargs):
-    text="Thanks for your answer. Goodbye!"
+    text = "Thanks for your answer. Goodbye!"
     return text, None  # empty options ends the menu
-

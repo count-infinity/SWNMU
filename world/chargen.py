@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from commands.command import Command
-from evennia.utils import evmenu
+from evennia.utils import evmenu, evtable
+
 from world.utils import pick_stats, render_stats
 from world import tables
 
@@ -24,7 +25,8 @@ class SWNCmdCharCreate(Command):
     help_category = "General"
 
     def func(self):
-        create_char_menu(self.caller, self.args)
+
+        create_char_menu(self.caller, self.caller.db.sheet.get('current_node',None))
 
 
 # class SWNChargenCmdSet(CmdSet):
@@ -36,7 +38,7 @@ class SWNCmdCharCreate(Command):
 #         self.add(ContribCmdCharCreate)
 
 
-def create_char_menu(caller, args):
+def create_char_menu(caller, start):
     evmenu.EvMenu(
         caller,
         {
@@ -44,7 +46,9 @@ def create_char_menu(caller, args):
             "end": node_end,
             "background": node_background,
             "background_select": node_background_select,
+            "node_background_skills": node_background_skills
         },
+        startnode=start
     )
 
 
@@ -76,6 +80,8 @@ def node_chargen_start(caller, raw_text, **kwargs):
         caller.db.sheet = {}
         caller.db.sheet['stats'] = pick_stats()
 
+    
+    caller.db.sheet['current_node']="start"
     if raw_text == "r":
         caller.db.sheet['stats'] = pick_stats()
         
@@ -93,6 +99,7 @@ def node_chargen_start(caller, raw_text, **kwargs):
 
 
 def node_background(caller, raw_input, **kwargs):
+    caller.db.sheet['current_node']="background"
     text = """
     Choose a background    
     """
@@ -112,9 +119,56 @@ def node_background(caller, raw_input, **kwargs):
 def node_background_select(caller, raw_input, **kwargs):
     picked_bg = kwargs["selected_background"]
     txt = f"{picked_bg}"
-    options = [backOpt("Back to backgrounds.", "background")]
+    options = [backOpt("Back to backgrounds.", "background"),
+               {
+                   "desc":f"Select {picked_bg.name} background",
+                   "goto": (_apply_background, { "selected_background" :picked_bg })
+               }]
 
     return txt, options
+
+def _apply_background(caller,raw_input,selected_background=None, **kwargs):
+    caller.db.sheet['background']=selected_background.name
+    return "node_background_skills"
+
+def node_background_skills(caller, raw_input, selected_background=None, **kwargs):
+    caller.db.sheet['current_node']="node_background_skills"
+
+    if selected_background is None:
+        bg_key=caller.db.sheet['background']
+        selected_background=tables.backgrounds[bg_key]
+
+    bg=tables.backgrounds[selected_background.name]
+
+    table = evtable.EvTable("Growth", "Learning",
+                table=[[f"{idx}. +{g.value} {g.stat}" for idx, g in enumerate(bg.growth)],
+                       [f"{idx}. +{g.value} {g.stat}" for idx, g in enumerate(bg.learning)]
+                       ])
+
+    
+    txt=f"""How would you like to allocate background skills?
+    {table}
+
+    """
+    options=[backOpt("Choose another background", "background"),
+             {
+                 "desc": "1 Random Growth"                                  
+             },
+             {
+                 "desc": "1 Random Learning"                 
+             },
+             {
+                 "desc": f"Quick pick ({','.join(bg.quick_skills)})"
+             },
+             {
+                 "key": "'pick <#>' to pick from the learning.",
+                 "desc": f"i.e. pick 2 would select {bg.learning[2].stat}"                 
+             },
+             abortOpt()]
+    
+    return txt, options
+
+
 
 
 def node_end(caller, raw_input, **kwargs):

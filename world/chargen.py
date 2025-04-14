@@ -1,8 +1,8 @@
+from dataclasses import dataclass
 from commands.command import Command
 from evennia.utils import evmenu
 from world.utils import pick_stats, render_stats
 from world import tables
-
 
 class TemporaryCharacterSheet:
     pass
@@ -37,7 +37,6 @@ class SWNCmdCharCreate(Command):
 
 
 def create_char_menu(caller, args):
-    print(f"Args: {args}")
     evmenu.EvMenu(
         caller,
         {
@@ -59,10 +58,10 @@ def abortOpt():
 
 def nextOpt(desc, goto, **kwargs):
     return {
-        "key": ("[N]ext", "next", "n"),
-        "desc": desc,
-        "goto": (goto, kwargs),
-    }
+            "key": ("[N]ext", "next", "n"),
+            "desc": desc,
+            "goto": (goto, kwargs),
+        }
 
 
 def backOpt(desc, goto, **kwargs):
@@ -72,14 +71,15 @@ def backOpt(desc, goto, **kwargs):
 
 def node_chargen_start(caller, raw_text, **kwargs):
     if not (
-        hasattr(caller.ndb._evmenu, "sheet") and caller.ndb._evmenu.sheet is not None
+        hasattr(caller.db, "sheet") and caller.db.sheet is not None
     ):
-        caller.ndb._evmenu.sheet = TemporaryCharacterSheet()
-        caller.ndb._evmenu.sheet.stats = pick_stats()
+        caller.db.sheet = {}
+        caller.db.sheet['stats'] = pick_stats()
 
     if raw_text == "r":
-        caller.ndb._evmenu.sheet.stats = pick_stats()
-    tbl = render_stats(caller.ndb._evmenu.sheet.stats)
+        caller.db.sheet['stats'] = pick_stats()
+        
+    tbl = render_stats(caller.db.sheet['stats'])
     text = f"""
 {tbl}
     """
@@ -99,10 +99,10 @@ def node_background(caller, raw_input, **kwargs):
 
     options = [
         {
-            "desc": f"{background.name} - {background.description}",
-            "goto": ("background_select", {"selected_background": background}),
+            "desc": f"{tables.backgrounds[background].name} - {tables.backgrounds[background].description}",
+            "goto": ("background_select", {"selected_background": tables.backgrounds[background]}),
         }
-        for background in tables.background
+        for background in tables.background_list
     ]
     options.extend([backOpt("Back to stats.", "start"), abortOpt()])
 

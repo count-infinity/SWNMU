@@ -54,6 +54,16 @@ class Background:
     def __repr__(self):
         attrs = [f"{key}={value!r}" for key, value in self.__dict__.items()]
         return f"Background({', '.join(attrs)})"
+    
+    def __str__(self):
+
+        items_str = '\n'.join(f"{key}={value!r}" for key, value in self.__dict__.items())
+        return f"""
+                Background: {self.name}
+                {self.description}
+                {items_str}
+                """
+
 
 
 @dataclass
@@ -62,8 +72,8 @@ class ModPoint:
     stat: str
 
 
-
-background=[Background("Barbarian"
+backgrounds={
+     "Barbarian": Background("Barbarian"
            , "Barbarian skills"
            , free_skill=["Survive"]
            , quick_skills=["Surive","Notice","Any-Combat"]
@@ -84,7 +94,7 @@ background=[Background("Barbarian"
                         ModPoint(1,"Survive"),
             ]
            ),
-           Background("Clergy"
+        "Clergy": Background("Clergy"
            , "Clergy skills"
            , free_skill=["Talk"]
            , quick_skills=["Talk","Perform","Know"]
@@ -106,4 +116,5 @@ background=[Background("Barbarian"
             ]
            ),           
            
-           ]
+}
+background_list=sorted(backgrounds.keys())

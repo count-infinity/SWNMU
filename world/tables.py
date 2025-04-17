@@ -76,7 +76,7 @@ backgrounds={
      "Barbarian": Background("Barbarian"
            , "Barbarian skills"
            , free_skill=["Survive"]
-           , quick_skills=["Surive","Notice","Any-Combat"]
+           , quick_skills=["Survive","Notice","Any-Combat"]
            , growth = [ModPoint(1,"Any Stat"),
                        ModPoint(2,"Physical"),
                        ModPoint(2,"Physical"),

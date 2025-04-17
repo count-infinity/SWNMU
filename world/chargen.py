@@ -211,13 +211,6 @@ def _apply_background(caller, raw_input, selected_background=None, **kwargs):
     for skill in selected_background.free_skill:
         caller.db.sheet['skills'][skill] = caller.db.sheet['skills'].get(skill, 0) + 1
     
-    # Store background info for later reference
-    caller.db.sheet['background_obj'] = {
-        'name': selected_background.name,
-        'growth': [{'stat': g.stat, 'value': g.value} for g in selected_background.growth],
-        'learning': [{'stat': l.stat, 'value': l.value} for l in selected_background.learning]
-    }
-    
     return "background_skills"
 
 
@@ -232,23 +225,31 @@ def node_background_skills(caller, raw_input, **kwargs):
     # Display current skills
     skill_display = ""
     if caller.db.sheet.get('skills'):
-        skill_rows = []
+        skill_col=[]
+        level_col=[]
+
         for skill, level in caller.db.sheet['skills'].items():
-            skill_rows.append([skill, level])
+            skill_col.append(skill)
+            level_col.append(level)
         
-        if skill_rows:
-            skill_table = evtable.EvTable("Skill", "Level", table=skill_rows)
+        if skill_col:
+            skill_table = evtable.EvTable("Skill", "Level", table=[
+                                                                skill_col,
+                                                                level_col                
+                                                            ]
+                                          )
             skill_display = f"\nCurrent Skills:\n{skill_table}"
     
     # Create tables for Growth and Learning options
+    
     growth_table = evtable.EvTable(
         "Option", "Growth Bonus", 
-        table=[[f"{idx+1}", f"+{g.value} {g.stat}"] for idx, g in enumerate(bg.growth)]
+        table=[[f"{i+1}" for i in range(len(bg.growth))],[f"+{g.value} {g.stat}" for g in bg.growth]]
     )
     
     learning_table = evtable.EvTable(
         "Option", "Learning Bonus",
-        table=[[f"{idx+1}", f"+{g.value} {g.stat}"] for idx, g in enumerate(bg.learning)]
+        table=[[f"{i+1}" for i in range(len(bg.learning))],[f"+{g.value} {g.stat}" for g in bg.learning]]
     )
     
     txt = f"""
@@ -446,8 +447,8 @@ def node_class_select(caller, raw_input, **kwargs):
         "Adventurer": "Hybrid class combining aspects of other classes"
     }
     
-    class_rows = [[name, desc] for name, desc in classes.items()]
-    class_table = evtable.EvTable("Class", "Description", table=class_rows)
+    name, desc=zip(*classes.items())
+    class_table = evtable.EvTable("Class", "Description", table=[list(name),list(desc)])
     
     txt = f"""
 |cCLASS SELECTION|n
@@ -494,12 +495,11 @@ def node_class_skills(caller, raw_input, **kwargs):
     # Display current skills
     skill_display = ""
     if caller.db.sheet.get('skills'):
-        skill_rows = []
-        for skill, level in caller.db.sheet['skills'].items():
-            skill_rows.append([skill, level])
+        skill, level=zip(*caller.db.sheet['skills'].items())
+       
         
-        if skill_rows:
-            skill_table = evtable.EvTable("Skill", "Level", table=skill_rows)
+        if skill:
+            skill_table = evtable.EvTable("Skill", "Level", table=[list(skill),list(level)])
             skill_display = f"\nCurrent Skills:\n{skill_table}"
     
     # This would need to be customized with actual class skill options
@@ -535,8 +535,8 @@ def node_foci_select(caller, raw_input, **kwargs):
         "Gunslinger": "Ranged combat specialist"
     }
     
-    foci_rows = [[name, desc] for name, desc in foci.items()]
-    foci_table = evtable.EvTable("Focus", "Description", table=foci_rows)
+    name, desc = map(list, zip(*foci.items()))
+    foci_table = evtable.EvTable("Focus", "Description", table=[name,desc])
     
     txt = f"""
 |cFOCUS SELECTION|n
@@ -661,12 +661,10 @@ def node_review(caller, raw_input, **kwargs):
     # Format skills
     skills_str = ""
     if caller.db.sheet.get('skills'):
-        skill_rows = []
-        for skill, level in caller.db.sheet['skills'].items():
-            skill_rows.append([skill, level])
+        name, level=map(list,zip(*caller.db.sheet['skills'].items()))       
         
-        if skill_rows:
-            skill_table = evtable.EvTable("Skill", "Level", table=skill_rows)
+        if name:
+            skill_table = evtable.EvTable("Skill", "Level", table=[name,level])
             skills_str = f"\n|cSKILLS:|n\n{skill_table}"
     
     # Format stats

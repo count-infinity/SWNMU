@@ -9,9 +9,15 @@ creation commands.
 """
 
 from evennia.objects.objects import DefaultCharacter
-
+from evennia.utils.utils import lazy_property
 from .objects import ObjectParent
+
+from world.skills import SkillHandler
+
+
 
 
 class Character(ObjectParent, DefaultCharacter):
-    pass
+    @lazy_property 
+    def skills(self):
+        return SkillHandler(self)

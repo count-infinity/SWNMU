@@ -16,7 +16,10 @@ own cmdsets by inheriting from them or directly from `evennia.CmdSet`.
 
 from evennia import default_cmds
 from commands.command import *
+from evennia.commands.default import syscommands
+
 from world.chargen import SWNCmdCharCreate
+from world.skills import CmdHack
 
 
 class CharacterCmdSet(default_cmds.CharacterCmdSet):
@@ -35,6 +38,7 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         super().at_cmdset_creation()        
         self.add(CmdBlah)
         self.add(CmdMXP)
+        self.add(CmdHack)
         #
         # any commands you add below will overload the default ones.
         #

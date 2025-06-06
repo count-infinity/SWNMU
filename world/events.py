@@ -22,7 +22,7 @@ class Event:
         self.target = target
         self.event_type = event_type
         self.pre_event_func = f"at_pre_event"
-        self.event_handler_func = f"at_event"
+        self.event_handler_func = f"handle_event"
         self.post_event_func = f"at_post_event"
         self.context = context
         self.history = []
@@ -47,25 +47,25 @@ class GlobalEventHandler:
     @classmethod
     def handleEvent(cls, event: Event):
 
-        if pre_handler := getattr(event.source, event.pre_event_func):
+        if pre_handler := getattr(event.source, event.pre_event_func, None):
             pre_handler(event)
-        if pre_handler := getattr(event.source.location, event.pre_event_func):
+        if pre_handler := getattr(event.source.location, event.pre_event_func, None):
             pre_handler(event)
-        if pre_handler := getattr(event.target, event.pre_event_func):
+        if pre_handler := getattr(event.target, event.pre_event_func, None):
             pre_handler(event)
 
-        if event_handler := getattr(event.source, event.event_handler_func):
+        if event_handler := getattr(event.source, event.event_handler_func, None):
             event_handler(event)
-        if event_handler := getattr(event.source.location, event.event_handler_func):
+        if event_handler := getattr(event.source.location, event.event_handler_func, None):
             event_handler(event)
-        if event_handler := getattr(event.target, event.event_handler_func):
+        if event_handler := getattr(event.target, event.event_handler_func, None):
             event_handler(event)
 
-        if post_handler := getattr(event.source, event.post_event_func):
+        if post_handler := getattr(event.source, event.post_event_func, None):
             post_handler(event)
-        if post_handler := getattr(event.source.location, event.post_event_func):
+        if post_handler := getattr(event.source.location, event.post_event_func, None):
             post_handler(event)
-        if post_handler := getattr(event.target, event.post_event_func):
+        if post_handler := getattr(event.target, event.post_event_func, None):
             post_handler(event)
 
         event.source.msg(event)

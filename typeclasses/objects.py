@@ -10,6 +10,9 @@ with a location in the game world (like Characters, Rooms, Exits).
 
 from evennia.objects.objects import DefaultObject
 
+from evennia.utils.utils import lazy_property
+from world.skills import BehaviorHandler
+
 
 class ObjectParent:
     """
@@ -214,4 +217,10 @@ class Object(ObjectParent, DefaultObject):
 
     """
 
-    pass
+    @lazy_property 
+    def behaviors(self):
+        return BehaviorHandler(self)
+
+    def handle_event(self, event):
+        event.source.msg("Handle event in object")        
+        self.behaviors.handle_event(event)

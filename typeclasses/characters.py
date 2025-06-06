@@ -15,8 +15,6 @@ from .objects import ObjectParent
 from world.skills import SkillHandler
 
 
-
-
 class Character(ObjectParent, DefaultCharacter):
     @lazy_property 
     def skills(self):

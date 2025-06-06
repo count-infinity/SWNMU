@@ -51,7 +51,6 @@ class CmdDebug(Command):
         caller.msg("Debugger attached")
         print("Debugger attached")
 
-
 class CmdBlah(Command):
     key = "blah"
     locks = "perm(Builder)"

@@ -30,6 +30,8 @@ class SWNCmdCharCreate(Command):
         
         # Get the current node or default to start
         current_node = self.caller.db.sheet.get('current_node', 'start')
+        if not current_node:
+            current_node='start'
         create_char_menu(self.caller, current_node)
 
 

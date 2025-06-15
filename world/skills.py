@@ -37,8 +37,8 @@ class CmdHack(BaseCommand):
         hack <target>
         
     This command allows you to use your Hack skill against a target
-    that has Hackable behavior. The event will be propagated to the
-    target for handling.
+    that has Hackable behavior. Uses the centralized SkillSystem
+    for consistent mechanics and detailed feedback.
     """
     
     key = "hack"
@@ -48,6 +48,7 @@ class CmdHack(BaseCommand):
 
     def func(self):
         from world.events import Event, GlobalEventHandler
+        from world.systems import SkillSystem
         
         caller = self.caller
         
@@ -59,10 +60,10 @@ class CmdHack(BaseCommand):
         if not target:
             return
             
-        # Check if caller has Hack skill
-        if not hasattr(caller, 'skills') or not caller.skills.all().get('Hack'):
-            caller.msg("You don't have the Hack skill.")
-            return
+        # Check if caller has Hack skill (allow untrained attempts)
+        skill_level = SkillSystem._get_skill_level(caller, 'Hack')
+        if skill_level == 0:
+            caller.msg("You attempt to hack without proper training (untrained penalty applies).")
             
         # Check if target is hackable
         if not hasattr(target, 'behaviors') or not target.behaviors.get('hackable'):
@@ -79,10 +80,8 @@ class CmdHack(BaseCommand):
         
         GlobalEventHandler.handleEvent(hack_event)
         
-        if not hack_event.context.cancelled:
-            caller.msg(f"You attempt to hack {target.name}.")
-        else:
-            caller.msg(f"Your hack attempt on {target.name} was blocked.")
+        # The event handling now provides detailed feedback through the systems
+        # No need for additional messages here as HackableSystem handles it
 
 
 class BehaviorHandler:
@@ -122,52 +121,35 @@ class BehaviorHandler:
 
 class HackableBehavior:
     """
-    Behavior that allows objects to be hacked.
-    Add this to an object's behaviors to make it hackable.
+    Lean behavior that configures an object to be hackable.
+    Contains only configuration data - logic is handled by HackableSystem.
     """
     
     key = "hackable"
     
-    def __init__(self, difficulty=10, hack_time=5, security_level=1):
+    def __init__(self, difficulty=10, hack_time=5, security_level=1, system_type="generic"):
         """
         Initialize hackable behavior with security parameters.
         
         Args:
-            difficulty (int): Base difficulty for hacking (higher = harder)
+            difficulty (int): SWN difficulty number for hacking (6-16)
             hack_time (int): Time in seconds required to complete hack
-            security_level (int): Security level (1-10, higher = more secure)
+            security_level (int): Security level (1-10, affects modifiers)
+            system_type (str): Type of system (affects available actions)
         """
         self.difficulty = difficulty
         self.hack_time = hack_time
         self.security_level = security_level
+        self.system_type = system_type
     
     def handle_event(self, event):
-        """Handle events, specifically hack events."""
+        """Handle events by delegating to appropriate system."""
         if event.event_type == "hack":
-            self.handle_hack_event(event)
-    
-    def handle_hack_event(self, event):
-        """
-        Handle a hack event. Override this method in subclasses
-        to implement specific hack behavior.
-        """
-        hacker = event.source
-        target = event.target
-        
-        # Calculate success chance based on difficulty and security level
-        base_success = 0.7  # Base 70% success rate
-        difficulty_modifier = self.difficulty * 0.05  # 5% per difficulty point
-        security_modifier = self.security_level * 0.08  # 8% per security level
-        
-        success_chance = max(0.1, base_success - difficulty_modifier - security_modifier)
-        
-        import random
-        if random.random() < success_chance:
-            hacker.msg(f"You successfully hack {target.name}! (Difficulty: {self.difficulty}, Security: {self.security_level})")
-            target.msg(f"You have been hacked by {hacker.name}!")
-            event.history.append(f"Hack successful - Difficulty: {self.difficulty}, Time: {self.hack_time}s")
-        else:
-            hacker.msg(f"Your hack attempt on {target.name} fails. (Difficulty: {self.difficulty}, Security: {self.security_level})")
-            target.msg(f"{hacker.name} attempted to hack you but failed.")
-            event.history.append(f"Hack failed - Difficulty: {self.difficulty}, Security: {self.security_level}")
-            event.context.cancelled = True
+            from world.systems import HackableSystem
+            hack_result = HackableSystem.attempt_hack(
+                event.source, event.target, self, event
+            )
+            
+            # Set event cancellation based on result
+            if not hack_result['skill_result'].success:
+                event.context.cancelled = True

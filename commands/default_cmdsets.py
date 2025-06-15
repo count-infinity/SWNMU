@@ -63,7 +63,7 @@ class AccountCmdSet(default_cmds.AccountCmdSet):
         # any commands you add below will overload the default ones.
         #
         self.add(CmdDebug)
-        self.add(SWNCmdCharCreate)
+        #self.add(SWNCmdCharCreate)
 
 
 class UnloggedinCmdSet(default_cmds.UnloggedinCmdSet):

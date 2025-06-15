@@ -9,6 +9,9 @@ from evennia.objects.objects import DefaultRoom
 
 from .objects import ObjectParent
 
+from evennia.utils.utils import lazy_property
+from world.skills import BehaviorHandler
+
 
 class Room(ObjectParent, DefaultRoom):
     """
@@ -21,4 +24,10 @@ class Room(ObjectParent, DefaultRoom):
     properties and methods available on all Objects.
     """
 
-    pass
+    @lazy_property 
+    def behaviors(self):
+        return BehaviorHandler(self)
+
+    def handle_event(self, event):
+        event.source.msg("Handle event in object")        
+        self.behaviors.handle_event(event)

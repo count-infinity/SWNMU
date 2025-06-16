@@ -24,10 +24,4 @@ class Room(ObjectParent, DefaultRoom):
     properties and methods available on all Objects.
     """
 
-    @lazy_property 
-    def behaviors(self):
-        return BehaviorHandler(self)
-
-    def handle_event(self, event):
-        event.source.msg("Handle event in object")        
-        self.behaviors.handle_event(event)
+    pass

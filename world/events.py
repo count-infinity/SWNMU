@@ -57,9 +57,7 @@ class GlobalEventHandler:
 
         if event_handler := getattr(event.source, event.event_handler_func, None):
             event_handler(event)
-        print(f"Location {event.source} - {event.source.location}")
         if event_handler := getattr(event.source.location, event.event_handler_func, None):
-            print("Location event handler")
             event_handler(event)
         if event_handler := getattr(event.target, event.event_handler_func, None):
             event_handler(event)

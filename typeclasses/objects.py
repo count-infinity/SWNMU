@@ -24,6 +24,12 @@ class ObjectParent:
     take precedence.
 
     """
+    @lazy_property 
+    def behaviors(self):
+        return BehaviorHandler(self)
+
+    def handle_event(self, event):       
+        self.behaviors.handle_event(event)
 
 
 class Object(ObjectParent, DefaultObject):
@@ -217,10 +223,4 @@ class Object(ObjectParent, DefaultObject):
 
     """
 
-    @lazy_property 
-    def behaviors(self):
-        return BehaviorHandler(self)
-
-    def handle_event(self, event):
-        event.source.msg("Handle event in object")        
-        self.behaviors.handle_event(event)
+    pass

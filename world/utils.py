@@ -3,7 +3,10 @@ from typing import List, Dict
 import re
 import random
 from evennia.utils import evtable
+from typeclasses.characters import Character
 from .tables import lookup, attribute_modifier_tbl
+
+from evennia.utils.dbserialize import dbserialize
 
 @dataclass
 class DiceResult:
@@ -172,3 +175,31 @@ def calculate_saving_throws(char_class: str, level: int, stats: Dict[str, int]) 
         "Tech": base_saves["Tech"] - get_ability_modifier(stats["INT"]),
         "Luck": base_saves["Luck"]  #
     }
+
+def available_name_firstlast(first, last):
+
+
+    sfirst = dbserialize(first)
+    firstname_results = Character.objects.filter(
+        db_attributes__db_key="firstname",
+        db_attributes__db_value__iexact=sfirst
+    )
+    
+    print(f"Characters with firstname '{first}':")
+    for char in firstname_results:
+        print(f"  - {char} (ID: {char.id})")
+    print(f"Count: {len(firstname_results)}")
+    
+    slast=dbserialize(last)
+    # Second filter - add lastname requirement
+    final_results = firstname_results.filter(
+        db_attributes__db_key="lastname",
+        db_attributes__db_value__iexact=slast
+    )
+    
+    print(f"\nCharacters with firstname '{first}' AND lastname '{last}':")
+    for char in final_results:
+        print(f"  - {char} (ID: {char.id})")
+    print(f"Count: {len(final_results)}")
+    
+    return len(final_results) < 1

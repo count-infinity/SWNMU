@@ -39,6 +39,10 @@ class CharacterCmdSet(default_cmds.CharacterCmdSet):
         self.add(CmdBlah)
         self.add(CmdMXP)
         self.add(CmdHack)
+        self.add(CmdOpen)
+        self.add(CmdActor)
+        self.add(CmdTestDelay)
+        self.add(CmdTestMonitor)
         #
         # any commands you add below will overload the default ones.
         #

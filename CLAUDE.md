@@ -10,7 +10,9 @@ This is an Evennia-based MUD implementing the Stars Without Number tabletop RPG 
 - **Game Setting**: Stars Without Number (SWN) sci-fi RPG system
 - **Server Name**: SWNMU
 - **Python Version**: Compatible with Evennia requirements
-
+## Core Code
+- Core code is located at ../fork-evennia/evennia/evennia
+- Use this to find code for evennia
 ### Character System (`typeclasses/characters.py`, `world/chargen.py`)
 - Character creation menu system using EvMenu
 - SWN character attributes (stats, background, class, foci)
